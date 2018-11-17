@@ -7,40 +7,57 @@ var hangManGame = {
     lettersGuessed: [],
     initialWord: "",
     tempArray: [],
-    currentWord: "",
-    hiddenWord: "",
+    currentWord: [],
+    hiddenWord: [],
     currentAsArray: [],
     hiddenAsArray: [],
     wordArray: ["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"],
     alphabet: ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"],
-    wordIndex: [],
-
+    wordIndex: 0,
 
     resetGame: function() {
         this.lettersGuessed = [];
-        this.wordIndex = Math.floor(Math.random() * 50);	
+        this.guessesLeft = this.currentWord.length + 5;
+        this.wordIndex = 47 //Math.floor((Math.random() * 50) + 1);	
         this.currentWord = this.wordArray[this.wordIndex].toLowerCase();
-        this.guessesLeft = this.currentWord.length + 2;
-        this.hiddenAsArray = [];
-        hangManGame.hideWord(this.currentWord);
-        this.currentAsArray = this.currentWord.split('');
-        // document.getElementById("hiddenWord").innerHTML = this.hiddenAsArray;
-        hangManGame.updateHidden();
+        // console.log(this.currentWord);
+        hangManGame.multiWord(this.currentWord);
+        // console.log(this.tempArray);
+        $.each(this.currentWord, function(index,word){
+            this.hiddenWord[index] = hangManGame.hideWord(this.currentWord[index]);
+        });
+        // this.hiddenWord = hangManGame.hideWord(this.currentWord);
+        // console.log(this.hiddenWord);
+        $.each(this.currentWord, function(index,word){
+            this.currentAsArray[index] = this.currentWord[index].split('');
+        });
+        // this.currentAsArray = this.currentWord.split('');
+
+        $.each(this.hiddenWord, function(index,word){
+            this.hiddenWord[index] = hangManGame.hideWord(this.currentWord[index]);
+        });
+        this.hiddenAsArray = this.hiddenWord.split('');
+
+        hangManGame.showLetter('');
+        document.getElementById("hiddenWord").innerHTML = this.hiddenWord;
         document.getElementById("lettersGuessed").innerHTML = "--";
         document.getElementById("guessesLeft").innerHTML = this.guessesLeft;
     },
 
+    multiWord: function(unknown) {
+        this.currentWord = unknown.split(" ");
+    },
+
     hideWord: function(word) {
-       for (i = 0; i < word.length; i++) {
-            if (word.charAt(i) == " ") {
-                this.hiddenAsArray.push(' ');
-            }
-            else {
-                this.hiddenAsArray.push('_');
-            }           
+        var dashes = "";
+        // console.log(word);
+        // console.log(word.length);
+        for (i = 0; i < word.length - 1; i++) {
+            // console.log(word.charAt(i));
+            dashes += "_ ";
         }
-        console.log(this.hiddenAsArray);
-        console.log(this.hiddenAsArray.toString());
+        dashes += "_";
+        return dashes;
     },
 
     processInput: function(key) {
@@ -70,21 +87,15 @@ var hangManGame = {
     },
 
     showLetter: function(key) {
+        console.log(this.hiddenAsArray);
         for (i = 0; i < this.currentWord.length; i++) {
             if (key == this.currentAsArray[i]) {
-                this.hiddenAsArray[i] = key;
+                this.hiddenAsArray[i * 2] = key;
+                console.log(this.hiddenAsArray[i *2]);
             }
         }
-        hangManGame.updateHidden();
+        document.getElementById("hiddenWord").innerHTML = this.hiddenAsArray.join(" ");
         hangManGame.isWinner();
-    },
-
-    updateHidden: function() {
-        document.getElementById("hiddenWord").innerHTML = "";
-        for (var i = 0; i < this.hiddenAsArray.length; i++) {
-            document.getElementById("hiddenWord").innerText += this.hiddenAsArray[i];
-        }
-        document.getElementById("hiddenWord").innerHTML = this.hiddenAsArray.toString().replace(/,/g, "");
     },
 
     isWinner: function() {
@@ -100,10 +111,11 @@ var hangManGame = {
 
 document.onkeypress = function (event) {
 	if (!hangManGame.hasStarted) {
-        document.getElementById("hiddenWord").innerHTML = "";
+        document.getElementById("pressAnyKey").innerHTML = "";
         hangManGame.resetGame();
 		hangManGame.processInput(event.key);
         hangManGame.hasStarted = true;
+        hangManGame.wordArray.length;
 	}
 	else {
 		hangManGame.processInput(event.key);

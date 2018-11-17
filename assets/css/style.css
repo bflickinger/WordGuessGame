@@ -1,0 +1,26 @@
+body{
+    font-family: 'Montserrat', sans-serif;
+}
+
+.jumbotron{
+	background-color: #d5d9e0;
+    color: #444444;
+}
+
+.jumbotron img{
+    display:block;
+    width: 250px;
+    height: 150px;
+    padding-top: 1%;
+    padding-bottom: 1%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+h1{
+    text-align: center;
+}
+
+#hiddenWord{
+    letter-spacing: 10px;
+}
